@@ -17,10 +17,10 @@ interface FilterSidebarProps {
 }
 
 export function FilterSidebar({ auctions, onFiltersChange }: FilterSidebarProps) {
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [selectedLocation, setSelectedLocation] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedLocation, setSelectedLocation] = useState('all');
   const [priceRange, setPriceRange] = useState({ min: '', max: '' });
-  const [condition, setCondition] = useState('');
+  const [condition, setCondition] = useState('all');
   const [sortBy, setSortBy] = useState('ending-soon');
 
   const categories = [...new Set(auctions.map(a => a.category))];
@@ -30,15 +30,15 @@ export function FilterSidebar({ auctions, onFiltersChange }: FilterSidebarProps)
   const applyFilters = () => {
     let filtered = [...auctions];
 
-    if (selectedCategory) {
+    if (selectedCategory && selectedCategory !== 'all') {
       filtered = filtered.filter(a => a.category === selectedCategory);
     }
 
-    if (selectedLocation) {
+    if (selectedLocation && selectedLocation !== 'all') {
       filtered = filtered.filter(a => a.location === selectedLocation);
     }
 
-    if (condition) {
+    if (condition && condition !== 'all') {
       filtered = filtered.filter(a => a.condition === condition);
     }
 
@@ -73,10 +73,10 @@ export function FilterSidebar({ auctions, onFiltersChange }: FilterSidebarProps)
   };
 
   const clearFilters = () => {
-    setSelectedCategory('');
-    setSelectedLocation('');
+    setSelectedCategory('all');
+    setSelectedLocation('all');
     setPriceRange({ min: '', max: '' });
-    setCondition('');
+    setCondition('all');
     setSortBy('ending-soon');
     onFiltersChange(auctions);
   };
@@ -86,9 +86,9 @@ export function FilterSidebar({ auctions, onFiltersChange }: FilterSidebarProps)
   }, [selectedCategory, selectedLocation, priceRange, condition, sortBy]);
 
   const activeFilterCount = [
-    selectedCategory,
-    selectedLocation,
-    condition,
+    selectedCategory !== 'all' ? selectedCategory : null,
+    selectedLocation !== 'all' ? selectedLocation : null,
+    condition !== 'all' ? condition : null,
     priceRange.min,
     priceRange.max
   ].filter(Boolean).length;
@@ -148,7 +148,7 @@ export function FilterSidebar({ auctions, onFiltersChange }: FilterSidebarProps)
                 <SelectValue placeholder="All categories" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Categories</SelectItem>
+                <SelectItem value="all">All Categories</SelectItem>
                 {categories.map(category => (
                   <SelectItem key={category} value={category}>
                     {category}
@@ -165,7 +165,7 @@ export function FilterSidebar({ auctions, onFiltersChange }: FilterSidebarProps)
                 <SelectValue placeholder="All locations" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Locations</SelectItem>
+                <SelectItem value="all">All Locations</SelectItem>
                 {locations.map(location => (
                   <SelectItem key={location} value={location}>
                     <div className="flex items-center gap-2">
@@ -185,7 +185,7 @@ export function FilterSidebar({ auctions, onFiltersChange }: FilterSidebarProps)
                 <SelectValue placeholder="Any condition" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Any Condition</SelectItem>
+                <SelectItem value="all">Any Condition</SelectItem>
                 {conditions.map(cond => (
                   <SelectItem key={cond} value={cond}>
                     {cond}

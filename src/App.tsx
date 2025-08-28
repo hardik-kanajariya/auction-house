@@ -170,6 +170,7 @@ function App() {
                       auction={auction}
                       onWatchToggle={handleWatchToggle}
                       isWatched={watchedAuctions.includes(auction.id)}
+                      onClick={() => setSelectedAuction(auction)}
                     />
                   ))}
                 </div>
@@ -191,6 +192,7 @@ function App() {
                       auction={auction}
                       onWatchToggle={handleWatchToggle}
                       isWatched={watchedAuctions.includes(auction.id)}
+                      onClick={() => setSelectedAuction(auction)}
                     />
                   ))}
                 </div>
@@ -217,13 +219,13 @@ function App() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredAuctions.map(auction => (
-                  <div key={auction.id} onClick={() => setSelectedAuction(auction)}>
-                    <AuctionCard
-                      auction={auction}
-                      onWatchToggle={handleWatchToggle}
-                      isWatched={watchedAuctions.includes(auction.id)}
-                    />
-                  </div>
+                  <AuctionCard
+                    key={auction.id}
+                    auction={auction}
+                    onWatchToggle={handleWatchToggle}
+                    isWatched={watchedAuctions.includes(auction.id)}
+                    onClick={() => setSelectedAuction(auction)}
+                  />
                 ))}
               </div>
 

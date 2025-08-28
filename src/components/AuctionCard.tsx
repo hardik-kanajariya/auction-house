@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
@@ -11,9 +10,10 @@ interface AuctionCardProps {
   auction: Auction;
   onWatchToggle?: (auctionId: string) => void;
   isWatched?: boolean;
+  onClick?: () => void;
 }
 
-export function AuctionCard({ auction, onWatchToggle, isWatched }: AuctionCardProps) {
+export function AuctionCard({ auction, onWatchToggle, isWatched, onClick }: AuctionCardProps) {
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -25,7 +25,7 @@ export function AuctionCard({ auction, onWatchToggle, isWatched }: AuctionCardPr
   const isEnded = auction.status === 'ended' || auction.status === 'sold';
 
   return (
-    <Card className="group hover:shadow-lg transition-all duration-200 hover:-translate-y-1">
+    <Card className="group hover:shadow-lg transition-all duration-200 hover:-translate-y-1 cursor-pointer" onClick={onClick}>
       <div className="relative">
         <div className="aspect-[4/3] bg-muted rounded-t-lg overflow-hidden">
           {auction.images.length > 0 ? (
@@ -102,12 +102,13 @@ export function AuctionCard({ auction, onWatchToggle, isWatched }: AuctionCardPr
               size="sm" 
               className="mb-3 justify-center"
             />
-            <Link to={`/auction/${auction.id}`} className="w-full">
-              <Button className="w-full">
-                <Gavel size={16} className="mr-2" />
-                Place Bid
-              </Button>
-            </Link>
+            <Button className="w-full" onClick={(e) => {
+              e.stopPropagation();
+              onClick?.();
+            }}>
+              <Gavel size={16} className="mr-2" />
+              Place Bid
+            </Button>
           </div>
         )}
         
@@ -119,11 +120,12 @@ export function AuctionCard({ auction, onWatchToggle, isWatched }: AuctionCardPr
             <div className="font-bold text-lg mb-3">
               {formatCurrency(auction.currentBid)}
             </div>
-            <Link to={`/auction/${auction.id}`} className="w-full">
-              <Button variant="outline" className="w-full">
-                View Details
-              </Button>
-            </Link>
+            <Button variant="outline" className="w-full" onClick={(e) => {
+              e.stopPropagation();
+              onClick?.();
+            }}>
+              View Details
+            </Button>
           </div>
         )}
 
@@ -135,11 +137,12 @@ export function AuctionCard({ auction, onWatchToggle, isWatched }: AuctionCardPr
               size="sm" 
               className="mb-3 justify-center"
             />
-            <Link to={`/auction/${auction.id}`} className="w-full">
-              <Button variant="outline" className="w-full">
-                View Details
-              </Button>
-            </Link>
+            <Button variant="outline" className="w-full" onClick={(e) => {
+              e.stopPropagation();
+              onClick?.();
+            }}>
+              View Details
+            </Button>
           </div>
         )}
       </CardFooter>

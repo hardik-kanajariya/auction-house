@@ -1,5 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Toaster } from '@/components/ui/sonner';
+import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import { AuthModal } from '@/components/AuthModal';
+import { UserDashboard } from '@/components/UserDashboard';
+import { AdminDashboard } from '@/components/AdminDashboard';
+import { PageLoading } from '@/components/LoadingStates';
 import { Header } from '@/components/Header';
 import { FilterSidebar } from '@/components/FilterSidebar';
 import { AuctionCard } from '@/components/AuctionCard';
@@ -25,7 +30,8 @@ const convertDatesToObjects = (auctions: any[]): Auction[] => {
   }));
 };
 
-function App() {
+const AppContent = () => {
+  const { isAuthenticated, user, isLoading: authLoading } = useAuth();
   const [storedAuctions, setStoredAuctions] = useKV<any[]>('auctions', []);
   const [auctions, setAuctions] = useState<Auction[]>([]);
   const [filteredAuctions, setFilteredAuctions] = useState<Auction[]>([]);
@@ -33,6 +39,17 @@ function App() {
   const [watchedAuctions, setWatchedAuctions] = useKV<string[]>('watched-auctions', []);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [currentView, setCurrentView] = useState<'home' | 'dashboard' | 'admin'>('home');
+  const [appLoading, setAppLoading] = useState(true);
+
+  // Initial app loading
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setAppLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   // Convert stored auctions to proper Date objects
   useEffect(() => {
@@ -90,6 +107,81 @@ function App() {
     })));
   };
 
+  const handleDashboard = () => {
+    if (user?.role === 'admin') {
+      setCurrentView('admin');
+    } else {
+      setCurrentView('dashboard');
+    }
+  };
+
+  // Show loading screen during initial app load
+  if (appLoading || authLoading) {
+    return <PageLoading />;
+  }
+
+  // Show authentication modal if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header 
+          onSearch={setSearchQuery}
+          onCategorySelect={setSelectedCategory}
+          onDashboard={handleDashboard}
+        />
+        <AuthModal />
+        <Toaster />
+      </div>
+    );
+  }
+
+  // Show dashboard views
+  if (currentView === 'dashboard') {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header 
+          onSearch={setSearchQuery}
+          onCategorySelect={setSelectedCategory}
+          onDashboard={handleDashboard}
+        />
+        <div className="container mx-auto px-4 py-4">
+          <Button 
+            variant="outline" 
+            onClick={() => setCurrentView('home')}
+            className="mb-4"
+          >
+            ← Back to Auctions
+          </Button>
+        </div>
+        <UserDashboard />
+        <Toaster />
+      </div>
+    );
+  }
+
+  if (currentView === 'admin') {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header 
+          onSearch={setSearchQuery}
+          onCategorySelect={setSelectedCategory}
+          onDashboard={handleDashboard}
+        />
+        <div className="container mx-auto px-4 py-4">
+          <Button 
+            variant="outline" 
+            onClick={() => setCurrentView('home')}
+            className="mb-4"
+          >
+            ← Back to Auctions
+          </Button>
+        </div>
+        <AdminDashboard />
+        <Toaster />
+      </div>
+    );
+  }
+
   const featuredAuctions = auctions.filter(a => a.status === 'active').slice(0, 3);
   const endingSoonAuctions = auctions
     .filter(a => a.status === 'active')
@@ -101,10 +193,10 @@ function App() {
       <Header 
         onSearch={setSearchQuery}
         onCategorySelect={setSelectedCategory}
+        onDashboard={handleDashboard}
       />
 
-      <main className="container mx-auto px-4 py-8">
-        {!searchQuery && !selectedCategory ? (
+      <main className="container mx-auto px-4 py-8">{!searchQuery && !selectedCategory ? (
           // Homepage
           <div className="space-y-12">
             {/* Hero Section */}
@@ -334,6 +426,14 @@ function App() {
 
       <Toaster />
     </div>
+  );
+};
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 

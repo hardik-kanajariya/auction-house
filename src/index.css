@@ -11,6 +11,22 @@
   }
 }
 
+@keyframes animation-delay-150 {
+  0%, 40%, 100% { 
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  20% { 
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animation-delay-150 {
+  animation: animation-delay-150 1.4s infinite ease-in-out;
+  animation-delay: 150ms;
+}
+
 :root {
   --background: oklch(0.98 0.01 250);
   --foreground: oklch(0.2 0.1 250);
